@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using LoggingSdk;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Serilog;
 using UserApi;
@@ -19,6 +20,7 @@ builder.WebHost.ConfigureKestrel((_, options) =>
 });
 
 var app = builder.Build();
+app.UseMiddleware<AccessLogMiddleware>();
 app.MapControllers();
 
 app.Map("/ping", httpContext =>
