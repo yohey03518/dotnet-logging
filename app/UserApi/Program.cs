@@ -10,9 +10,11 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSerilog();
-// builder.Services.AddLogging();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(o =>
+{
+    o.Filters.Add<AccessLogFilter>();
+});
 
 builder.WebHost.ConfigureKestrel((_, options) =>
 {

@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using LoggingSdk;
+using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
 namespace UserApi;
 
+// [TypeFilter<AccessLogFilter>]
 public class UserInfoController(ILogger<UserInfoController> logger): ControllerBase
 {
     [HttpGet("api/v1/user")]
@@ -12,5 +14,11 @@ public class UserInfoController(ILogger<UserInfoController> logger): ControllerB
         logger.LogInformation($"DI log {id}");
 
         return id;
+    }
+    
+    [HttpGet("api/v2/user")]
+    public JsonResult GetJson(int id)
+    {
+        return new JsonResult(new { id });
     }
 }
