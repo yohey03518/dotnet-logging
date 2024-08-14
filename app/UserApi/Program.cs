@@ -10,6 +10,8 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSerilog();
+builder.Services.AddGrpc();
+builder.Services.AddGrpcReflection();
 
 builder.Services.AddControllers(o =>
 {
@@ -19,6 +21,7 @@ builder.Services.AddControllers(o =>
 builder.WebHost.ConfigureKestrel((_, options) =>
 {
     options.Listen(IPAddress.Any,  53664, listenOptions => { listenOptions.Protocols = HttpProtocols.Http1; });
+    options.Listen(IPAddress.Any,  53665, listenOptions => { listenOptions.Protocols = HttpProtocols.Http2; });
 });
 
 var app = builder.Build();
@@ -31,4 +34,9 @@ app.Map("/ping", httpContext =>
     log.LogInformation("hello");
     return httpContext.Response.WriteAsync("pong");
 });
+
+app.UseRouting();
+app.MapGrpcService<UserGrpcService>();
+app.MapGrpcReflectionService();
+
 app.Run();
