@@ -9,8 +9,10 @@ Log.Logger = new LoggerConfiguration()
     // .WriteTo.File("mylog.txt")
     .WriteTo.Console(outputTemplate: "[{Level:u}] {Timestamp:O} [{RequestId}] - {Message}{NewLine}{Exception}")
     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .Enrich.FromLogContext()
     .CreateLogger();
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Services.AddSerilog();
 builder.Services.AddGrpc();
 builder.Services.AddGrpcReflection();
@@ -33,6 +35,7 @@ app.MapControllers();
 app.Map("/ping", httpContext =>
 {
     var log = httpContext.RequestServices.GetService<ILogger<UserInfoController>>();
+    Log.Information("static");
     log.LogInformation("hello");
     return httpContext.Response.WriteAsync("pong");
 });
