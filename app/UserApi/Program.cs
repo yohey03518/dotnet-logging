@@ -2,11 +2,13 @@
 using LoggingSdk;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Serilog;
+using Serilog.Events;
 using UserApi;
 
 Log.Logger = new LoggerConfiguration()
     // .WriteTo.File("mylog.txt")
     .WriteTo.Console(outputTemplate: "[{Level:u}] {Timestamp:O} [{RequestId}] - {Message}{NewLine}{Exception}")
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
     .CreateLogger();
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSerilog();

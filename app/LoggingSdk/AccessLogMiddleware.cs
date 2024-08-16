@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Text;
 
 namespace LoggingSdk;
 
@@ -7,7 +7,12 @@ public class AccessLogMiddleware(RequestDelegate next, ILogger<AccessLogMiddlewa
 
     public async Task Invoke(HttpContext context)
     {
-        logger.LogInformation("hello middleware");
+        var request = context.Request;
+        request.EnableBuffering();
+        var requestBodyText = await new StreamReader(request.Body).ReadToEndAsync();
+        request.Body.Position = 0;
+        
+        logger.LogInformation("hello middleware {requestBody}", requestBodyText);
         await next(context);
     }
 }
