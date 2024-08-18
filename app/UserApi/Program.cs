@@ -6,8 +6,7 @@ using Serilog.Events;
 using UserApi;
 
 Log.Logger = new LoggerConfiguration()
-    // .WriteTo.File("mylog.txt")
-    .WriteTo.Console(outputTemplate: "[{Level:u}] {Timestamp:O} [{RequestId}] - {Message}{NewLine}{Exception}")
+    .WriteTo.Console(outputTemplate: "[{Level:u}] {Timestamp:yyyy/MM/dd-HH:mm:ss} [{RequestId}] [{SourceContext}]{NewLine}{Message}{NewLine}{Exception}")
     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
     .Enrich.FromLogContext()
     .CreateLogger();
@@ -28,10 +27,11 @@ builder.WebHost.ConfigureKestrel((_, options) =>
     options.Listen(IPAddress.Any,  53665, listenOptions => { listenOptions.Protocols = HttpProtocols.Http2; });
 });
 
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 app.UseMiddleware<AccessLogMiddleware>();
 app.MapControllers();
-
 app.Map("/ping", httpContext =>
 {
     var log = httpContext.RequestServices.GetService<ILogger<UserInfoController>>();
