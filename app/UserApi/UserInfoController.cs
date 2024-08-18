@@ -1,5 +1,4 @@
-﻿using LoggingSdk;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
 namespace UserApi;
@@ -15,10 +14,19 @@ public class UserInfoController(ILogger<UserInfoController> logger): ControllerB
 
         return id;
     }
-    
-    [HttpGet("api/v2/user")]
-    public JsonResult GetJson(int id)
+
+    [HttpPost("api/v1/user")]
+    public MyUser Add([FromForm] MyUser user)
     {
-        return new JsonResult(new { id });
+        user.Id = 1;
+        return user;
     }
+}
+
+public class MyUser
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Email { get; set; }
+    public string Mobile { get; set; }
 }
