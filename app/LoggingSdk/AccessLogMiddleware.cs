@@ -13,15 +13,29 @@ public class AccessLogMiddleware(RequestDelegate next, ILogger<AccessLogMiddlewa
         stopwatch.Start();
         var requestStartTime = DateTime.Now;
 
-        var originalBodyStream = context.Response.Body;
-        await using var memoryStream = new MemoryStream();
-        response.Body = memoryStream;
+        string responseBodyText;
 
-        await next(context);
+        var isGrpc = request.ContentType == "application/grpc";
+        if (!isGrpc)
+        {
+            var originalBodyStream = context.Response.Body;
+            await using var memoryStream = new MemoryStream();
+            response.Body = memoryStream;
+
+            await next(context);
+
+            responseBodyText = await GetResponseBody(response);
+            await memoryStream.CopyToAsync(originalBodyStream);
+        }
+        else 
+        {
+            await next(context);
+            responseBodyText = string.Empty;
+        }
 
         logger.LogInformation("{RequestTime} {method} {scheme} {host} {Path} {QueryString} {StatusCode} {ElapsedMilliseconds}ms {ClientIP} {RequestHeaders} {RequestBody} {ResponseHeaders} {ResponseBody}",
             requestStartTime.ToString("O"),
-            request.Method,
+            isGrpc ? "gRPC" : request.Method,
             request.Scheme,
             request.Host,
             request.Path,
@@ -31,13 +45,11 @@ public class AccessLogMiddleware(RequestDelegate next, ILogger<AccessLogMiddlewa
             request.HttpContext.Connection.RemoteIpAddress!.ToString(),
             // string.Join(';', request.Headers.Where(x => x.Key != "Cookie").Select(x => $"{x.Key}:{x.Value}")),
             "request header",
-            await GetRequestBody(request),
+            isGrpc ? string.Empty : await GetRequestBody(request),
             // string.Join(';', response.Headers.Where(x => x.Key != "Cookie").Select(x => $"{x.Key}:{x.Value}")),
             "response header",
-            await GetResponseBody(response)
+            isGrpc ? string.Empty : responseBodyText
         );
-        
-        await memoryStream.CopyToAsync(originalBodyStream);
     }
 
     private static async Task<string> GetResponseBody(HttpResponse response)

@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using LoggingSdk;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Serilog;
 using Serilog.Events;
@@ -15,6 +16,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSerilog();
 builder.Services.AddGrpc();
 builder.Services.AddGrpcReflection();
+// builder.Services.AddHttpLogging(c =>
+// {
+//     c.LoggingFields = HttpLoggingFields.All;
+//     c.CombineLogs = true;
+// });
 
 builder.Services.AddControllers(o =>
 {
@@ -30,7 +36,9 @@ builder.WebHost.ConfigureKestrel((_, options) =>
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+// app.UseHttpLogging();
 app.UseMiddleware<AccessLogMiddleware>();
+
 app.MapControllers();
 app.Map("/ping", httpContext =>
 {
