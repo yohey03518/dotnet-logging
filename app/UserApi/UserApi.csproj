@@ -16,7 +16,8 @@
       </PackageReference>
       <PackageReference Include="Serilog.AspNetCore" Version="8.0.2" />
       <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.1" />
-        <Protobuf Include="User.proto" GrpcServices="Server" />
+      <Protobuf Include="User.proto" GrpcServices="Server" />
+      <Protobuf Include="../ConfigApi/Config.proto" GrpcServices="Client" />
     </ItemGroup>
 
     <ItemGroup>

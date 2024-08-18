@@ -9,6 +9,7 @@ using UserApi;
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console(outputTemplate: "[{Level:u}] {Timestamp:yyyy/MM/dd-HH:mm:ss} [{RequestId}] [{SourceContext}]{NewLine}{Message}{NewLine}{Exception}")
     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("System", LogEventLevel.Warning)
     .Enrich.FromLogContext()
     .CreateLogger();
 var builder = WebApplication.CreateBuilder(args);
@@ -24,7 +25,7 @@ builder.Services.AddGrpcReflection();
 
 builder.Services.AddControllers(o =>
 {
-    o.Filters.Add<AccessLogFilter>();
+    // o.Filters.Add<AccessLogFilter>();
 });
 
 builder.WebHost.ConfigureKestrel((_, options) =>
@@ -34,6 +35,9 @@ builder.WebHost.ConfigureKestrel((_, options) =>
 });
 
 builder.Services.AddSwaggerGen();
+builder.Services.AddTransient<GrpcLoggingInterceptor>();
+builder.Services.AddGrpcClient<ConfigApi.ConfigApi.ConfigApiClient>(x => x.Address = new Uri("http://localhost:53667"))
+    .AddInterceptor<GrpcLoggingInterceptor>();
 
 var app = builder.Build();
 // app.UseHttpLogging();
@@ -51,5 +55,7 @@ app.Map("/ping", httpContext =>
 app.UseRouting();
 app.MapGrpcService<UserGrpcService>();
 app.MapGrpcReflectionService();
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.Run();
