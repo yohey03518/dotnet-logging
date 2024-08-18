@@ -8,22 +8,23 @@ public class AccessLogMiddleware(RequestDelegate next, ILogger<AccessLogMiddlewa
     {
         var request = context.Request;
         var response = context.Response;
+        var isGrpc = request.ContentType == "application/grpc";
         
         var stopwatch = new Stopwatch();
         stopwatch.Start();
         var requestStartTime = DateTime.Now;
+        var requestBodyText = isGrpc ? string.Empty : await GetRequestBody(request);
 
         string responseBodyText;
 
-        var isGrpc = request.ContentType == "application/grpc";
         if (!isGrpc)
         {
             var originalBodyStream = context.Response.Body;
             await using var memoryStream = new MemoryStream();
             response.Body = memoryStream;
-
+        
             await next(context);
-
+        
             responseBodyText = await GetResponseBody(response);
             await memoryStream.CopyToAsync(originalBodyStream);
         }
@@ -32,6 +33,7 @@ public class AccessLogMiddleware(RequestDelegate next, ILogger<AccessLogMiddlewa
             await next(context);
             responseBodyText = string.Empty;
         }
+
 
         logger.LogInformation("{RequestTime} {method} {scheme} {host} {Path} {QueryString} {StatusCode} {ElapsedMilliseconds}ms {ClientIP} {RequestHeaders} {RequestBody} {ResponseHeaders} {ResponseBody}",
             requestStartTime.ToString("O"),
@@ -45,7 +47,7 @@ public class AccessLogMiddleware(RequestDelegate next, ILogger<AccessLogMiddlewa
             request.HttpContext.Connection.RemoteIpAddress!.ToString(),
             // string.Join(';', request.Headers.Where(x => x.Key != "Cookie").Select(x => $"{x.Key}:{x.Value}")),
             "request header",
-            isGrpc ? string.Empty : await GetRequestBody(request),
+            requestBodyText,
             // string.Join(';', response.Headers.Where(x => x.Key != "Cookie").Select(x => $"{x.Key}:{x.Value}")),
             "response header",
             isGrpc ? string.Empty : responseBodyText
@@ -64,6 +66,7 @@ public class AccessLogMiddleware(RequestDelegate next, ILogger<AccessLogMiddlewa
     private static async Task<string> GetRequestBody(HttpRequest request)
     {
         request.EnableBuffering();
+        request.Body.Position = 0;
         var requestBodyText = await new StreamReader(request.Body).ReadToEndAsync();
         request.Body.Position = 0;
         return requestBodyText;
