@@ -14,7 +14,7 @@ Log.Logger = new LoggerConfiguration()
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSerilog();
-builder.Services.AddGrpc();
+builder.Services.AddGrpc(x => x.Interceptors.Add<GrpcLoggingInterceptor>());
 builder.Services.AddGrpcReflection();
 // builder.Services.AddHttpLogging(c =>
 // {
