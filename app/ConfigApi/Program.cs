@@ -15,6 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSerilog();
 builder.Services.AddGrpc(x => x.Interceptors.Add<GrpcLoggingInterceptor>());
 builder.Services.AddGrpcReflection();
+builder.Services.AddControllers();
 builder.WebHost.ConfigureKestrel((_, options) =>
 {
     options.Listen(IPAddress.Any,  53666, listenOptions => { listenOptions.Protocols = HttpProtocols.Http1; });
@@ -23,6 +24,7 @@ builder.WebHost.ConfigureKestrel((_, options) =>
 
 var app = builder.Build();
 app.UseMiddleware<AccessLogMiddleware>();
+app.MapControllers();
 app.MapGrpcService<ConfigGrpcService>();
 app.MapGrpcReflectionService();
 

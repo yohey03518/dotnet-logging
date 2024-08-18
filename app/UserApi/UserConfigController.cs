@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace UserApi;
 
-public class UserConfigController(ConfigApi.ConfigApi.ConfigApiClient configApi)
+public class UserConfigController(ConfigApi.ConfigApi.ConfigApiClient configApi, IHttpClientFactory httpClientFactory)
 {
+    private HttpClient _httpClient = httpClientFactory.CreateClient("ConfigHttpApi");
+    
     [HttpGet("api/v1/user/{id}/config")]
     public async Task<UserConfig> GetUser(string id)
     {
@@ -20,4 +22,18 @@ public class UserConfigController(ConfigApi.ConfigApi.ConfigApiClient configApi)
             Value = result.Value
         };
     }
+    
+    [HttpPatch("api/v1/user/{userId}/payment-config")]
+    public async Task<List<PaymentConfig>> UpdateUserPayment([FromRoute] string userId, [FromBody] PaymentConfig paymentConfig)
+    {
+        var patchAsJsonAsync = await _httpClient.PatchAsJsonAsync("api/v1/payment-config", paymentConfig);
+
+        return (await patchAsJsonAsync.Content.ReadFromJsonAsync<List<PaymentConfig>>())!;
+    }
+}
+
+public class PaymentConfig
+{
+    public string PaymentMethod { get; set; }
+    public decimal MaxAmount { get; set; }
 }

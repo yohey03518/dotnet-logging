@@ -36,8 +36,12 @@ builder.WebHost.ConfigureKestrel((_, options) =>
 
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<GrpcLoggingInterceptor>();
+builder.Services.AddTransient<LogHttpMessageHandler>();
 builder.Services.AddGrpcClient<ConfigApi.ConfigApi.ConfigApiClient>(x => x.Address = new Uri("http://localhost:53667"))
     .AddInterceptor<GrpcLoggingInterceptor>();
+
+builder.Services.AddHttpClient("ConfigHttpApi", client => client.BaseAddress = new Uri("http://localhost:53666"))
+    .AddHttpMessageHandler<LogHttpMessageHandler>();
 
 var app = builder.Build();
 // app.UseHttpLogging();
