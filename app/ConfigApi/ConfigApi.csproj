@@ -1,10 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
     <PropertyGroup>
-        <OutputType>Library</OutputType>
+        <OutputType>Exe</OutputType>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="Grpc.AspNetCore" Version="2.65.0" />
         <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.65.0" />
@@ -12,7 +14,9 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1"/>
+        <PackageReference Include="Serilog.AspNetCore" Version="8.0.2" />
+        <Protobuf Include="Config.proto" GrpcServices="Server" />
+        <ProjectReference Include="..\LoggingSdk\LoggingSdk.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option csharp_namespace = "ConfigApi";
+
+package ConfigApi;
+
+service ConfigApi {
+  rpc GetConfig (GetConfigRequest) returns (GetConfigReply);
+}
+
+message GetConfigRequest {
+  string name = 1;
+}
+
+message GetConfigReply {
+  string name = 1;
+  string value = 2;
+}

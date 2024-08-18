@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserApi", "UserApi\UserApi.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoggingSdk", "LoggingSdk\LoggingSdk.csproj", "{89F4AED0-301A-471A-BE59-101F5E751589}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigApi", "ConfigApi\ConfigApi.csproj", "{04BEA090-4CEA-4A2C-8061-E4BEF4E015DA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{89F4AED0-301A-471A-BE59-101F5E751589}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89F4AED0-301A-471A-BE59-101F5E751589}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{89F4AED0-301A-471A-BE59-101F5E751589}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04BEA090-4CEA-4A2C-8061-E4BEF4E015DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04BEA090-4CEA-4A2C-8061-E4BEF4E015DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04BEA090-4CEA-4A2C-8061-E4BEF4E015DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04BEA090-4CEA-4A2C-8061-E4BEF4E015DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
