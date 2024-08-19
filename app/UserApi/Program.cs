@@ -10,6 +10,7 @@ using UserApi;
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console(outputTemplate: "[{Level:u}] {Timestamp:yyyy/MM/dd-HH:mm:ss} [{RequestId}] [{SourceContext}]{NewLine}{Message}{NewLine}{Exception}")
     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Information)
     .MinimumLevel.Override("System", LogEventLevel.Warning)
     .Enrich.FromLogContext()
     .CreateLogger();
@@ -46,7 +47,6 @@ builder.Services.AddHttpClient("ConfigHttpApi", client => client.BaseAddress = n
 
 builder.Services.AddDbContext<UserManagementDbContext>(o =>
 {
-    // o.UseSqlServer("Server=127.0.0.1;Database=UserManagement;User Id=sa;Password=YourStrongPassword!123;");
     o.UseSqlServer("Data Source=127.0.0.1;Database=UserManagement;User ID=sa;Password=YourStrongPassword!123;TrustServerCertificate=True;");
     o.UseLoggerFactory(LoggerFactory.Create(builder => builder.AddSerilog()));
 });

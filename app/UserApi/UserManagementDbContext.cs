@@ -1,40 +1,67 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using UserApi.Entities;
 
 namespace UserApi;
 
-public class UserManagementDbContext : Microsoft.EntityFrameworkCore.DbContext
+public class UserManagementDbContext : DbContext
 {
     public UserManagementDbContext(DbContextOptions<UserManagementDbContext> options) : base(options)
     { }
 
     public DbSet<UserProfile> UserProfiles { get; set; }
-}
+    public DbSet<ActionLog> ActionLogs { get; set; }
 
-public class UserProfile : BaseEntity
-{
-    [StringLength(50)]
-    public string FirstName { get; set; }
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        RecordActionLog();
+        return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
 
-    [StringLength(50)]
-    public string LastName { get; set; }
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = new CancellationToken())
+    {
+        RecordActionLog();
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
 
-    [StringLength(50)]
-    public string Email { get; set; }
-}
+    private void RecordActionLog()
+    {
+        var entityEntries = ChangeTracker.Entries().Where(x => x.State == EntityState.Modified).ToList();
 
-public class BaseEntity
-{
-    public int Id { get; set; }
+        foreach (var modifiedEntity in entityEntries)
+        {
+            var tableName = modifiedEntity.Metadata.GetTableName();
+            var baseEntity = (BaseEntity)modifiedEntity.Entity;
+            var entityId = baseEntity.Id;
 
-    public DateTime CreatedOn { get; set; }
+            var modifiedBy = baseEntity.ModifiedBy;
 
-    [Required]
-    [StringLength(50)]
-    public string? CreatedBy { get; set; }
+            foreach (var property in modifiedEntity.Properties)
+            {
+                var columnName = property.Metadata.Name;
+                var oldValue = property.OriginalValue?.ToString() ?? string.Empty;
+                var newValue = property.CurrentValue?.ToString() ?? string.Empty;
 
-    public DateTime? ModifiedOn { get; set; }
+                if (oldValue == newValue)
+                {
+                    continue;
+                }
 
-    [StringLength(50)]
-    public string? ModifiedBy { get; set; }
+                var hasAttr = property.HasLogAttr(modifiedEntity);
+
+                if (hasAttr)
+                {
+                    ActionLogs.Add(new ActionLog
+                    {
+                        CreatedOn = DateTime.Now,
+                        CreatedBy = modifiedBy ?? string.Empty,
+                        TargetTable = tableName,
+                        TargetId = entityId,
+                        TargetColumn = columnName,
+                        OldValue = oldValue,
+                        NewValue = newValue
+                    });
+                }
+            }
+        }
+    }
 }
