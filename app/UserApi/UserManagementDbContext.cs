@@ -32,7 +32,6 @@ public class UserManagementDbContext : DbContext
             var tableName = modifiedEntity.Metadata.GetTableName();
             var baseEntity = (BaseEntity)modifiedEntity.Entity;
             var entityId = baseEntity.Id;
-
             var modifiedBy = baseEntity.ModifiedBy;
 
             foreach (var property in modifiedEntity.Properties)
@@ -46,9 +45,7 @@ public class UserManagementDbContext : DbContext
                     continue;
                 }
 
-                var hasAttr = property.HasLogAttr(modifiedEntity);
-
-                if (hasAttr)
+                if (modifiedEntity.NeedLogChange(property))
                 {
                     ActionLogs.Add(new ActionLog
                     {

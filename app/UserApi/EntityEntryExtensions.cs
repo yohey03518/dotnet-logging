@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace UserApi;
 
-public static class PropertyEntryExtensions
+public static class EntityEntryExtensions
 {
     // tableName -> column Name -> boolean of whether record action log
     private static readonly ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> CacheMap = new();
 
-    public static bool HasLogAttr(this PropertyEntry property, EntityEntry modifiedEntity)
+    public static bool NeedLogChange(this EntityEntry modifiedEntity, PropertyEntry property)
     {
         var tableName = modifiedEntity.Metadata.GetTableName()!;
         var propertyName = property.Metadata.Name;

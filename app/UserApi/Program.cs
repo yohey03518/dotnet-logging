@@ -48,7 +48,7 @@ builder.Services.AddHttpClient("ConfigHttpApi", client => client.BaseAddress = n
 builder.Services.AddDbContext<UserManagementDbContext>(o =>
 {
     o.UseSqlServer("Data Source=127.0.0.1;Database=UserManagement;User ID=sa;Password=YourStrongPassword!123;TrustServerCertificate=True;");
-    o.UseLoggerFactory(LoggerFactory.Create(builder => builder.AddSerilog()));
+    o.UseLoggerFactory(LoggerFactory.Create(c => c.AddSerilog()));
 });
 
 var app = builder.Build();
