@@ -2,6 +2,7 @@
 using LoggingSdk;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
 using UserApi;
@@ -43,6 +44,13 @@ builder.Services.AddGrpcClient<ConfigApi.ConfigApi.ConfigApiClient>(x => x.Addre
 builder.Services.AddHttpClient("ConfigHttpApi", client => client.BaseAddress = new Uri("http://localhost:53666"))
     .AddHttpMessageHandler<LogHttpMessageHandler>();
 
+builder.Services.AddDbContext<UserManagementDbContext>(o =>
+{
+    // o.UseSqlServer("Server=127.0.0.1;Database=UserManagement;User Id=sa;Password=YourStrongPassword!123;");
+    o.UseSqlServer("Data Source=127.0.0.1;Database=UserManagement;User ID=sa;Password=YourStrongPassword!123;TrustServerCertificate=True;");
+    o.UseLoggerFactory(LoggerFactory.Create(builder => builder.AddSerilog()));
+});
+
 var app = builder.Build();
 // app.UseHttpLogging();
 app.UseMiddleware<AccessLogMiddleware>();
@@ -61,5 +69,12 @@ app.MapGrpcService<UserGrpcService>();
 app.MapGrpcReflectionService();
 app.UseSwagger();
 app.UseSwaggerUI();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<UserManagementDbContext>();
+    dbContext.Database.EnsureCreated();
+    dbContext.Database.Migrate();
+}
 
 app.Run();
