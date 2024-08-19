@@ -45,6 +45,7 @@ builder.Services.AddGrpcClient<ConfigApi.ConfigApi.ConfigApiClient>(x => x.Addre
 builder.Services.AddHttpClient("ConfigHttpApi", client => client.BaseAddress = new Uri("http://localhost:53666"))
     .AddHttpMessageHandler<LogHttpMessageHandler>();
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<UserManagementDbContext>(o =>
 {
     o.UseSqlServer("Data Source=127.0.0.1;Database=UserManagement;User ID=sa;Password=YourStrongPassword!123;TrustServerCertificate=True;");

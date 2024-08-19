@@ -25,4 +25,7 @@ public class ActionLog
 
     public DateTime CreatedOn { get; set; }
     public string CreatedBy { get; set; }
+
+    [StringLength(100)]
+    public string RequestId { get; set; }
 }

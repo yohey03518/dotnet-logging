@@ -3,11 +3,9 @@ using UserApi.Entities;
 
 namespace UserApi;
 
-public class UserManagementDbContext : DbContext
+public class UserManagementDbContext(DbContextOptions<UserManagementDbContext> options, IHttpContextAccessor httpContextAccessor, ILogger<UserManagementDbContext> logger)
+    : DbContext(options)
 {
-    public UserManagementDbContext(DbContextOptions<UserManagementDbContext> options) : base(options)
-    { }
-
     public DbSet<UserProfile> UserProfiles { get; set; }
     public DbSet<ActionLog> ActionLogs { get; set; }
 
@@ -55,7 +53,8 @@ public class UserManagementDbContext : DbContext
                         TargetId = entityId,
                         TargetColumn = columnName,
                         OldValue = oldValue,
-                        NewValue = newValue
+                        NewValue = newValue,
+                        RequestId = httpContextAccessor.HttpContext!.TraceIdentifier
                     });
                 }
             }
