@@ -27,6 +27,7 @@ builder.WebHost.ConfigureKestrel((_, options) =>
 });
 
 var app = builder.Build();
+app.UseMiddleware<UseIncomingRequestIdMiddleware>();
 app.UseMiddleware<AccessLogMiddleware>();
 app.MapControllers();
 app.MapGrpcService<ConfigGrpcService>();
