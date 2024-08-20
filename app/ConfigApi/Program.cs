@@ -5,9 +5,13 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Serilog;
 using Serilog.Events;
 
+var outputTemplate = "[{Level:u}] {Timestamp:O} [{RequestId}] [{SourceContext}] {NewLine}{Message}{NewLine}{Exception}";
+
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console(outputTemplate: "[{Level:u}] {Timestamp:yyyy/MM/dd-HH:mm:ss} [{RequestId}] [{SourceContext}]{NewLine}{Message}{NewLine}{Exception}")
+    .WriteTo.Console(outputTemplate: outputTemplate)
+    .WriteTo.File("logs/config-api.log", rollingInterval: RollingInterval.Day, outputTemplate: outputTemplate)
     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Information)
     .MinimumLevel.Override("System", LogEventLevel.Warning)
     .Enrich.FromLogContext()
     .CreateLogger();

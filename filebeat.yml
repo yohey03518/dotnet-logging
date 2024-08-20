@@ -1,0 +1,30 @@
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /var/log/**/*.log
+  multiline:
+    pattern: '^\['
+    negate: true
+    match: after
+  processors:
+    - dissect:
+        tokenizer: "/var/log/%{project}/%{filename}"
+        field: "log.file.path"
+        target_prefix: ""
+    - dissect:
+        tokenizer: '[%{level}] %{log_time} [%{request_id}] [%{source_context}] %{log_message}'
+        target_prefix: ""
+        ignore_failure: true
+
+output.elasticsearch:
+  hosts: ["http://elasticsearch:9200" ]
+  username: elastic
+  password: changeme
+  # pipeline: access-log-parser-pipeline
+  loadbalance: true
+  worker: 6
+  bulk_max_size: 6000
+  flush_interval: 10s
+
+logging.level: debug
