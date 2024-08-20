@@ -40,11 +40,14 @@ builder.WebHost.ConfigureKestrel((_, options) =>
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<GrpcLoggingInterceptor>();
 builder.Services.AddTransient<LogHttpMessageHandler>();
+builder.Services.AddTransient<AddRequestIdHandler>();
 builder.Services.AddGrpcClient<ConfigApi.ConfigApi.ConfigApiClient>(x => x.Address = new Uri("http://localhost:53667"))
-    .AddInterceptor<GrpcLoggingInterceptor>();
+    .AddInterceptor<GrpcLoggingInterceptor>()
+    .AddHttpMessageHandler<AddRequestIdHandler>();
 
 builder.Services.AddHttpClient("ConfigHttpApi", client => client.BaseAddress = new Uri("http://localhost:53666"))
-    .AddHttpMessageHandler<LogHttpMessageHandler>();
+    .AddHttpMessageHandler<LogHttpMessageHandler>()
+    .AddHttpMessageHandler<AddRequestIdHandler>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<UserManagementDbContext>(o =>
