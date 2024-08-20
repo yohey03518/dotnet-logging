@@ -21,6 +21,8 @@ public class UserProfileController(UserManagementDbContext dbContext)
         profile.FirstName = userProfile.FirstName;
         profile.LastName = userProfile.LastName;
         profile.Email = userProfile.Email;
+        profile.ModifiedBy = userProfile.ModifiedBy;
+        profile.ModifiedOn = DateTime.Now;
         
         dbContext.SaveChanges();
 
