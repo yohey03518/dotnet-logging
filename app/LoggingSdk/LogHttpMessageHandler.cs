@@ -2,21 +2,12 @@
 
 namespace LoggingSdk;
 
-public class LogHttpMessageHandler : DelegatingHandler
+public class LogHttpMessageHandler(ILogger<LogHttpMessageHandler> logger) : DelegatingHandler
 {
-    private readonly ILogger<LogHttpMessageHandler> _logger;
-
-    public LogHttpMessageHandler(ILogger<LogHttpMessageHandler> logger)
-    {
-        _logger = logger;
-    }
-
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
-        var requestContent = await GetRequestContent(request);
-        var message = $"[Send Request Start] Url: {request.RequestUri.AbsoluteUri} Method: {request.Method} RequestContent: {requestContent}";
-        _logger.LogInformation(message);
+        await LogRequest(request, cancellationToken);
 
         var stopWatch = Stopwatch.StartNew();
         var httpResponseMessage = await base.SendAsync(request, cancellationToken);
@@ -26,37 +17,21 @@ public class LogHttpMessageHandler : DelegatingHandler
         return httpResponseMessage;
     }
 
-    private async Task<string> GetRequestContent(HttpRequestMessage request)
+    private async Task LogRequest(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        var requestContent = request.Content != null && !await IsContainsImagePart(request) 
-            ? await request.Content.ReadAsStringAsync()
+        var requestContent = request.Content != null
+            ? await request.Content.ReadAsStringAsync(cancellationToken)
             : string.Empty;
 
-        return requestContent;
-    }
-    
-    private async Task<bool> IsContainsImagePart(HttpRequestMessage request)
-    {
-        if (request.Content is MultipartFormDataContent multipartContent)
-        {
-            foreach (var contentPart in multipartContent)
-            {
-                if (contentPart.Headers.ContentDisposition?.Name?.Trim('"').ToLower() == "image")
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
+        logger.LogInformation("[Send Request Start] Url: {Url} Method: {RequestMethod} RequestContent: {RequestContent}"
+            , request.RequestUri!.AbsoluteUri, request.Method, requestContent);
     }
 
     private async Task LogResponse(HttpRequestMessage request, HttpResponseMessage httpResponseMessage, long elapsedMilliseconds)
     {
-        var responseContent = httpResponseMessage.Content != null
-            ? await httpResponseMessage.Content.ReadAsStringAsync()
-            : string.Empty;
+        var responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
 
-        var responseMessage = $"[Send Request End] Url: {request.RequestUri.AbsoluteUri} Duration:{elapsedMilliseconds} ResponseStatus: {httpResponseMessage.StatusCode}({(int)httpResponseMessage.StatusCode})\nResponseContent: {responseContent}";
-        _logger.LogInformation(responseMessage);
+        logger.LogInformation("[Send Request End] Url: {Url} Duration: {Duration}ms ResponseStatus: {StatusCode}\nResponseContent: {ResponseContent}"
+            , request.RequestUri!.AbsoluteUri, elapsedMilliseconds, (int)httpResponseMessage.StatusCode, responseContent);
     }
 }

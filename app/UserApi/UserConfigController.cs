@@ -5,7 +5,7 @@ namespace UserApi;
 
 public class UserConfigController(ConfigApi.ConfigApi.ConfigApiClient configApi, IHttpClientFactory httpClientFactory)
 {
-    private HttpClient _httpClient = httpClientFactory.CreateClient("ConfigHttpApi");
+    private readonly HttpClient _httpClient = httpClientFactory.CreateClient("ConfigHttpApi");
     
     [HttpGet("api/v1/user/{id}/config")]
     public async Task<UserConfig> GetUser(string id)
