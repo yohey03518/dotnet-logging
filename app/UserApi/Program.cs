@@ -7,11 +7,9 @@ using Serilog;
 using Serilog.Events;
 using UserApi;
 
-var outputTemplate = "[{Level:u}] {Timestamp:O} [{RequestId}] [{SourceContext}] {NewLine}{Message}{NewLine}{Exception}";
-
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console(outputTemplate: outputTemplate)
-    .WriteTo.File("logs/user-api.log", rollingInterval: RollingInterval.Day, outputTemplate: outputTemplate)
+    .WriteTo.Console(outputTemplate: Constants.LogTemplate)
+    .WriteTo.File("logs/user-api.log", rollingInterval: RollingInterval.Day, outputTemplate: Constants.LogTemplate)
     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
     .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Information)
     .MinimumLevel.Override("System", LogEventLevel.Warning)
