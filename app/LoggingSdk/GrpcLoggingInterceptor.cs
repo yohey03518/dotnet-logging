@@ -14,7 +14,7 @@ public class GrpcLoggingInterceptor(ILogger<GrpcLoggingInterceptor> logger) : In
     {
         try
         {
-            logger.LogInformation("[send gRPC Request Start] [{method}] [{Request}]", context.Method.FullName, request.ToString());
+            logger.LogInformation("send gRPC Request Start [{method}] [{Request}]", context.Method.FullName, request.ToString());
             
             var stopwatch = Stopwatch.StartNew();
             var call = continuation(request, context);
@@ -41,12 +41,12 @@ public class GrpcLoggingInterceptor(ILogger<GrpcLoggingInterceptor> logger) : In
     {
         try
         {
-            logger.LogInformation("[receive gRPC Request Start] [{host}] [{method}] [{Request}]", context.Host, context.Method, request.ToString());
+            logger.LogInformation("receive gRPC Request Start [{host}] [{method}] [{Request}]", context.Host, context.Method, request.ToString());
             var stopwatch = Stopwatch.StartNew();
             var response = await continuation(request, context);
             stopwatch.Stop();
             var milliseconds = stopwatch.ElapsedMilliseconds;
-            logger.LogInformation("[receive gRPC Request End] [{host}] [{method}] [{time}ms] [{Response}]", context.Host, context.Method, milliseconds, response.ToString());
+            logger.LogInformation("receive gRPC Request End [{host}] [{method}] [{time}ms] [{Response}]", context.Host, context.Method, milliseconds, response.ToString());
             return response;
         }
         catch (RpcException e)
@@ -59,7 +59,7 @@ public class GrpcLoggingInterceptor(ILogger<GrpcLoggingInterceptor> logger) : In
     private async Task<TResponse> LogClientResponse<TResponse>(string fullName, AsyncUnaryCall<TResponse> call, Stopwatch stopwatch)
     {
         var response = await call;
-        logger.LogInformation("[send gRPC Request End] [{method}] [{time}ms] [{Response}]", fullName, stopwatch.ElapsedMilliseconds, response?.ToString() ?? string.Empty);
+        logger.LogInformation("send gRPC Request End [{method}] [{time}ms] [{Response}]", fullName, stopwatch.ElapsedMilliseconds, response?.ToString() ?? string.Empty);
         return response;
     }
 }

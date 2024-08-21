@@ -23,7 +23,7 @@ public class LogHttpMessageHandler(ILogger<LogHttpMessageHandler> logger) : Dele
             ? await request.Content.ReadAsStringAsync(cancellationToken)
             : string.Empty;
 
-        logger.LogInformation("[Send Request Start] Url: {Url} Method: {RequestMethod} RequestContent: {RequestContent}"
+        logger.LogInformation("Request Start, Url: {Url} Method: {RequestMethod} RequestContent: {RequestContent}"
             , request.RequestUri!.AbsoluteUri, request.Method, requestContent);
     }
 
@@ -31,7 +31,7 @@ public class LogHttpMessageHandler(ILogger<LogHttpMessageHandler> logger) : Dele
     {
         var responseContent = await httpResponseMessage.Content.ReadAsStringAsync();
 
-        logger.LogInformation("[Send Request End] Url: {Url} Duration: {Duration}ms ResponseStatus: {StatusCode}\nResponseContent: {ResponseContent}"
+        logger.LogInformation("Request End Url: {Url} Duration: {Duration}ms ResponseStatus: {StatusCode}\nResponseContent: {ResponseContent}"
             , request.RequestUri!.AbsoluteUri, elapsedMilliseconds, (int)httpResponseMessage.StatusCode, responseContent);
     }
 }

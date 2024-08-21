@@ -16,12 +16,19 @@ filebeat.inputs:
         tokenizer: '[%{level}] %{log_time} [%{request_id}] [%{source_context}] %{log_message}'
         target_prefix: ""
         ignore_failure: true
+    - timestamp:
+        field: log_time
+        layouts:
+          - '2006-01-02T15:04:05.9999999Z07:00'
+        test:
+          - '2024-08-21T09:18:01.0573769+08:00'
+    - drop_fields:
+        fields: ["log_time"]
 
 output.elasticsearch:
   hosts: ["http://elasticsearch:9200" ]
   username: elastic
   password: changeme
-  # pipeline: access-log-parser-pipeline
   loadbalance: true
   worker: 6
   bulk_max_size: 6000
