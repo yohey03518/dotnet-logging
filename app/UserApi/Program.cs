@@ -63,8 +63,7 @@ app.UseMiddleware<AccessLogMiddleware>();
 app.MapControllers();
 app.Map("/ping", httpContext =>
 {
-    var log = httpContext.RequestServices.GetService<ILogger<UserInfoController>>();
-    Log.Information("static");
+    var log = httpContext.RequestServices.GetService<ILogger<Program>>();
     log.LogInformation("hello");
     return httpContext.Response.WriteAsync("pong");
 });

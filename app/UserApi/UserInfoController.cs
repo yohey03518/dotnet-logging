@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Serilog;
 
 namespace UserApi;
 
@@ -9,9 +8,7 @@ public class UserInfoController(ILogger<UserInfoController> logger): ControllerB
     [HttpGet("api/v1/user")]
     public int Get(int id)
     {
-        Log.Information($"static method log {id}");
-        logger.LogInformation($"DI log {id}");
-
+        logger.LogInformation($"Logger from DI log {id}");
         return id;
     }
 

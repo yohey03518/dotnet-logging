@@ -34,7 +34,6 @@ public class AccessLogMiddleware(RequestDelegate next, ILogger<AccessLogMiddlewa
             responseBodyText = string.Empty;
         }
 
-
         logger.LogInformation("{RequestTime} {method} {scheme} {host} {Path} {QueryString} {StatusCode} {ElapsedMilliseconds}ms {ClientIP} {RequestHeaders} {RequestBody} {ResponseHeaders} {ResponseBody}",
             requestStartTime.ToString("O"),
             isGrpc ? "gRPC" : request.Method,
