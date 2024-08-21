@@ -12,6 +12,17 @@ Start all the services
 docker-compose -f docker-compose.yaml -- up -d
 ```
 
+Adjust the path of your applications' log in `docker-compose.yml` for filebeat to get log
+```
+  filebeat:
+    ...
+    volumes:
+      - /filebeat.yml:/etc/filebeat.yml:ro
+      # modify here base on the path in your environment
+      - /mnt/d/git/dotnet-logging/app/UserApi/logs:/var/log/UserApi:ro
+      - /mnt/d/git/dotnet-logging/app/ConfigApi/logs:/var/log/ConfigApi:ro
+```
+
 After running above services, it is required to set up index pattern in Kibana:
 - Write some logs from application
 - Browse [Elasticsearch Index](http://localhost:9200/_cat/indices?v) to make sure there is `filebeat-*` index
