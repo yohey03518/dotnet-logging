@@ -2,7 +2,7 @@ filebeat.inputs:
 - type: log
   enabled: true
   paths:
-    - /var/log/**/*.log
+    - /var/log/*/*.log
   multiline:
     pattern: '^\['
     negate: true

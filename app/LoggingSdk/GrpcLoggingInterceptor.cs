@@ -20,7 +20,7 @@ public class GrpcLoggingInterceptor(ILogger<GrpcLoggingInterceptor> logger) : In
             var call = continuation(request, context);
 
             return new AsyncUnaryCall<TResponse>(
-                LogClientResponse<TResponse>(context.Method.FullName, call, stopwatch),
+                LogClientResponse(context.Method.FullName, call, stopwatch),
                 call.ResponseHeadersAsync,
                 call.GetStatus,
                 call.GetTrailers,

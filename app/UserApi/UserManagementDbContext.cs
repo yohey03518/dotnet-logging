@@ -49,7 +49,7 @@ public class UserManagementDbContext(DbContextOptions<UserManagementDbContext> o
                     {
                         CreatedOn = DateTime.Now,
                         CreatedBy = modifiedBy ?? string.Empty,
-                        TargetTable = tableName,
+                        TargetTable = tableName!,
                         TargetId = entityId,
                         TargetColumn = columnName,
                         OldValue = oldValue,
