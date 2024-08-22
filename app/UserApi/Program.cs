@@ -15,6 +15,7 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("System", LogEventLevel.Warning)
     .Enrich.FromLogContext()
     .CreateLogger();
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSerilog();
@@ -43,11 +44,13 @@ builder.Services.AddTransient<LogHttpMessageHandler>();
 builder.Services.AddTransient<AddRequestIdHandler>();
 builder.Services.AddGrpcClient<ConfigApi.ConfigApi.ConfigApiClient>(x => x.Address = new Uri("http://localhost:53667"))
     .AddInterceptor<GrpcLoggingInterceptor>()
-    .AddHttpMessageHandler<AddRequestIdHandler>();
+    .AddHttpMessageHandler<AddRequestIdHandler>()
+    ;
 
 builder.Services.AddHttpClient("ConfigHttpApi", client => client.BaseAddress = new Uri("http://localhost:53666"))
     .AddHttpMessageHandler<LogHttpMessageHandler>()
-    .AddHttpMessageHandler<AddRequestIdHandler>();
+    .AddHttpMessageHandler<AddRequestIdHandler>()
+    ;
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<UserManagementDbContext>(o =>
@@ -63,7 +66,7 @@ app.UseMiddleware<AccessLogMiddleware>();
 app.MapControllers();
 app.Map("/ping", httpContext =>
 {
-    var log = httpContext.RequestServices.GetService<ILogger<Program>>();
+    var log = httpContext.RequestServices.GetService<ILogger<Program>>()!;
     log.LogInformation("hello");
     return httpContext.Response.WriteAsync("pong");
 });

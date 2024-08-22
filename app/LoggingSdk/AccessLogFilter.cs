@@ -45,6 +45,5 @@ public class AccessLogFilter(ILogger<AccessLogFilter> logger) : ActionFilterAttr
             _ => context.Result?.ToString() ?? string.Empty
         };
         logger.LogInformation("OnActionExecutedAsync: {result}", result);
-        await next();
     }
 }
