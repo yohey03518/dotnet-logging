@@ -8,6 +8,7 @@ using Serilog.Events;
 using UserApi;
 
 Log.Logger = new LoggerConfiguration()
+    // .Enrich.With(new SensitiveDataMaskEnricher())
     .WriteTo.Console(outputTemplate: Constants.LogTemplate)
     .WriteTo.File("logs/user-api.log", rollingInterval: RollingInterval.Day, outputTemplate: Constants.LogTemplate)
     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)

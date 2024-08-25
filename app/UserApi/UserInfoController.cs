@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using LoggingSdk;
+using Microsoft.AspNetCore.Mvc;
 
 namespace UserApi;
 
@@ -8,7 +9,7 @@ public class UserInfoController(ILogger<UserInfoController> logger): ControllerB
     [HttpGet("api/v1/user")]
     public int Get(int id)
     {
-        logger.LogInformation($"Logger from DI log {id}");
+        logger.LogInformation("log {id}", id);
         return id;
     }
 
@@ -18,4 +19,24 @@ public class UserInfoController(ILogger<UserInfoController> logger): ControllerB
         user.Id = 1;
         return user;
     }
+
+    [HttpPatch("api/v1/user")]
+    public MyUser UpdateMobile([FromBody] UpdateMobileRequest request)
+    {
+        logger.LogInformation("request: {@request}", request);
+        
+        return new MyUser
+        {
+            Id = request.UserId,
+            Name = "test",
+            Email = "user@email.com",
+            Mobile = request.NewMobile
+        };
+    }
+}
+
+public class UpdateMobileRequest
+{
+    public int UserId { get; set; }
+    public required string NewMobile { get; set; }
 }
